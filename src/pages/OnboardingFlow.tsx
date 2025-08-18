@@ -1,65 +1,215 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Sparkles, Save, CheckCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
+import StepAboutYou from "@/components/onboarding/StepAboutYou";
+import StepSkillsInterests from "@/components/onboarding/StepSkillsInterests";
+import StepCareerGoals from "@/components/onboarding/StepCareerGoals";
+import StepPitch from "@/components/onboarding/StepPitch";
+import OnboardingPreview from "@/components/onboarding/OnboardingPreview";
+
+interface CandidateData {
+  name: string;
+  email: string;
+  experience: string;
+  skills: string[];
+  interests: string[];
+  goals: string;
+  availability: string;
+  pitch_text: string;
+}
 
 const OnboardingFlow = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
+  const [candidateId, setCandidateId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState<CandidateData>({
     name: "",
+    email: "",
     experience: "",
-    skills: [] as string[],
-    goals: "",
+    skills: [],
     interests: [],
-    availability: ""
+    goals: "",
+    availability: "",
+    pitch_text: ""
   });
 
   const steps = [
     {
-      title: "Welcome! Let's get to know you",
+      title: "About You",
       description: "Tell us about yourself to create your personalized career profile"
     },
     {
-      title: "Your Experience & Skills",
-      description: "Help us understand your professional background"
+      title: "Skills & Interests",
+      description: "Help us understand your expertise and what motivates you"
     },
     {
-      title: "Career Goals & Aspirations",
+      title: "Career Goals",
       description: "Where do you see yourself heading?"
     },
     {
-      title: "Interests & Preferences",
-      description: "What motivates you in your work?"
+      title: "60-Second Pitch",
+      description: "Create your compelling elevator pitch"
     }
   ];
 
-  const skillSuggestions = [
-    "JavaScript", "Python", "React", "Node.js", "Project Management", "Data Analysis",
-    "UX Design", "Marketing", "Sales", "Communication", "Leadership", "Problem Solving"
-  ];
+  // Load saved data on component mount
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedId = localStorage.getItem('onboarding_candidate_id');
+      if (savedId) {
+        const { data, error } = await supabase
+          .from('candidates')
+          .select('*')
+          .eq('id', savedId)
+          .single();
 
-  const addSkill = (skill: string) => {
-    if (!formData.skills.includes(skill)) {
-      setFormData({ ...formData, skills: [...formData.skills, skill] });
+        if (data && !error) {
+          setFormData({
+            name: data.name || "",
+            email: data.email || "",
+            experience: data.experience || "",
+            skills: data.skills || [],
+            interests: data.interests || [],
+            goals: data.goals || "",
+            availability: data.availability || "",
+            pitch_text: data.pitch_text || ""
+          });
+          setCandidateId(data.id);
+          setCurrentStep(data.is_complete ? 3 : getCurrentStepFromData(data));
+        }
+      }
+      setIsLoading(false);
+    };
+
+    loadSavedData();
+  }, []);
+
+  const getCurrentStepFromData = (data: any) => {
+    if (!data.name || !data.email || !data.experience) return 0;
+    if (data.skills.length === 0 || data.interests.length === 0) return 1;
+    if (!data.goals || !data.availability) return 2;
+    return 3;
+  };
+
+  const updateData = (updates: Partial<CandidateData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      Object.keys(updates).forEach(key => {
+        delete newErrors[key];
+      });
+      return newErrors;
+    });
+  };
+
+  const validateStep = (step: number): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    switch (step) {
+      case 0:
+        if (!formData.name.trim()) newErrors.name = "Name is required";
+        if (!formData.email.trim()) newErrors.email = "Email is required";
+        if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+          newErrors.email = "Please enter a valid email";
+        }
+        if (!formData.experience.trim()) newErrors.experience = "Experience is required";
+        break;
+      case 1:
+        if (formData.skills.length === 0) newErrors.skills = "Please select at least one skill";
+        if (formData.interests.length === 0) newErrors.interests = "Please select at least one interest";
+        break;
+      case 2:
+        if (!formData.goals.trim()) newErrors.goals = "Career goals are required";
+        if (!formData.availability) newErrors.availability = "Availability is required";
+        break;
+      case 3:
+        if (!formData.pitch_text.trim()) newErrors.pitch_text = "Pitch text is required";
+        break;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const saveToSupabase = async (isComplete = false) => {
+    setIsSaving(true);
+    try {
+      const candidateData = {
+        ...formData,
+        is_complete: isComplete,
+        updated_at: new Date().toISOString()
+      };
+
+      if (candidateId) {
+        const { error } = await supabase
+          .from('candidates')
+          .update(candidateData)
+          .eq('id', candidateId);
+
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from('candidates')
+          .insert([candidateData])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setCandidateId(data.id);
+          localStorage.setItem('onboarding_candidate_id', data.id);
+        }
+      }
+
+      toast({
+        title: "Progress saved",
+        description: "Your information has been saved successfully."
+      });
+    } catch (error) {
+      console.error('Error saving to Supabase:', error);
+      toast({
+        title: "Save failed",
+        description: "Unable to save your progress. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const removeSkill = (skill: string) => {
-    setFormData({ ...formData, skills: formData.skills.filter(s => s !== skill) });
-  };
+  const nextStep = async () => {
+    if (!validateStep(currentStep)) {
+      toast({
+        title: "Please complete all required fields",
+        description: "Fix the errors below to continue.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  const nextStep = () => {
+    await saveToSupabase();
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Navigate to profile page
-      window.location.href = "/profile";
+      // Complete onboarding
+      await saveToSupabase(true);
+      localStorage.removeItem('onboarding_candidate_id');
+      toast({
+        title: "Profile completed! 🎉",
+        description: "Your AI-powered career profile is ready.",
+      });
+      navigate("/profile");
     }
   };
 
@@ -69,152 +219,143 @@ const OnboardingFlow = () => {
     }
   };
 
+  const saveAndExit = async () => {
+    await saveToSupabase();
+    toast({
+      title: "Progress saved",
+      description: "You can resume your profile later.",
+    });
+    navigate("/");
+  };
+
   const progress = ((currentStep + 1) / steps.length) * 100;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 py-8">
-      <div className="container mx-auto px-4 max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center text-primary hover:text-primary/80 mb-4">
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Home
-          </Link>
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">AI Career Profile Builder</h1>
-          </div>
-          <Progress value={progress} className="w-full max-w-md mx-auto" />
-          <p className="text-sm text-muted-foreground mt-2">
-            Step {currentStep + 1} of {steps.length}
-          </p>
-        </div>
-
-        {/* Current Step Content */}
-        <Card className="p-8 animate-fadeIn">
-          <div className="text-center mb-8">
-            <h2 className="text-xl font-semibold mb-2">{steps[currentStep].title}</h2>
-            <p className="text-muted-foreground">{steps[currentStep].description}</p>
-          </div>
-
-          {/* Step 0: Basic Info */}
-          {currentStep === 0 && (
-            <div className="space-y-6">
-              <div>
-                <Label htmlFor="name">What's your name?</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter your full name"
-                  className="mt-2"
-                />
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Form */}
+          <div className="lg:col-span-2 max-w-2xl mx-auto lg:mx-0">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <Link to="/" className="inline-flex items-center text-primary hover:text-primary/80">
+                  <ChevronLeft className="mr-1 h-4 w-4" />
+                  Back to Home
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={saveAndExit}
+                  disabled={isSaving}
+                  className="flex items-center space-x-2"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Save & Exit</span>
+                </Button>
               </div>
-              <div>
-                <Label htmlFor="experience">How would you describe your professional experience?</Label>
-                <Textarea
-                  id="experience"
-                  value={formData.experience}
-                  onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                  placeholder="Tell us about your background, education, or work experience..."
-                  className="mt-2 min-h-[100px]"
-                />
+              <div className="flex items-center justify-center space-x-2 mb-4">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <h1 className="text-2xl font-bold">AI Career Profile Builder</h1>
               </div>
+              <Progress value={progress} className="w-full max-w-md mx-auto" />
+              <p className="text-sm text-muted-foreground mt-2">
+                Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
+              </p>
             </div>
-          )}
 
-          {/* Step 1: Skills */}
-          {currentStep === 1 && (
-            <div className="space-y-6">
-              <div>
-                <Label>What skills do you have? (Click to add)</Label>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {skillSuggestions.map((skill) => (
-                    <Badge
-                      key={skill}
-                      variant={formData.skills.includes(skill) ? "default" : "secondary"}
-                      className="cursor-pointer hover:bg-primary/80 transition-colors"
-                      onClick={() => formData.skills.includes(skill) ? removeSkill(skill) : addSkill(skill)}
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              {formData.skills.length > 0 && (
-                <div>
-                  <Label>Selected Skills:</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {formData.skills.map((skill) => (
-                      <Badge key={skill} variant="default" className="cursor-pointer" onClick={() => removeSkill(skill)}>
-                        {skill} ×
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+            {/* Current Step Content */}
+            <Card className="p-8 animate-fadeIn">
+              {currentStep === 0 && (
+                <StepAboutYou 
+                  data={formData} 
+                  updateData={updateData} 
+                  errors={errors} 
+                />
               )}
-            </div>
-          )}
-
-          {/* Step 2: Goals */}
-          {currentStep === 2 && (
-            <div className="space-y-6">
-              <div>
-                <Label htmlFor="goals">What are your career goals?</Label>
-                <Textarea
-                  id="goals"
-                  value={formData.goals}
-                  onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
-                  placeholder="Describe your ideal role, company culture, or career aspirations..."
-                  className="mt-2 min-h-[120px]"
+              
+              {currentStep === 1 && (
+                <StepSkillsInterests 
+                  data={formData} 
+                  updateData={updateData} 
+                  errors={errors} 
                 />
-              </div>
-              <div>
-                <Label htmlFor="availability">When are you looking to make a move?</Label>
-                <Input
-                  id="availability"
-                  value={formData.availability}
-                  onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-                  placeholder="e.g., Immediately, In 3 months, Just exploring..."
-                  className="mt-2"
+              )}
+              
+              {currentStep === 2 && (
+                <StepCareerGoals 
+                  data={formData} 
+                  updateData={updateData} 
+                  errors={errors} 
                 />
-              </div>
-            </div>
-          )}
+              )}
+              
+              {currentStep === 3 && (
+                <StepPitch 
+                  data={formData} 
+                  updateData={updateData} 
+                  errors={errors} 
+                />
+              )}
 
-          {/* Step 3: Interests */}
-          {currentStep === 3 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-primary mb-4">🎉 Great! Your profile is almost ready</h3>
-                <p className="text-muted-foreground mb-6">
-                  Our AI will now analyze your responses and create a comprehensive skills profile. 
-                  Next, you'll be able to record your 60-second pitch!
-                </p>
-                <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-6">
-                  <h4 className="font-semibold mb-2">What's Next:</h4>
-                  <ul className="text-sm text-muted-foreground space-y-2">
-                    <li>✨ AI generates your dynamic skills profile</li>
-                    <li>🎥 Record your 60-second career pitch</li>
-                    <li>🚀 Get matched with perfect opportunities</li>
-                  </ul>
-                </div>
+              {/* Navigation */}
+              <div className="flex justify-between mt-8">
+                <Button 
+                  variant="outline" 
+                  onClick={prevStep} 
+                  disabled={currentStep === 0}
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Previous
+                </Button>
+                <Button 
+                  onClick={nextStep} 
+                  disabled={isSaving}
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                >
+                  {isSaving ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Saving...</span>
+                    </div>
+                  ) : (
+                    <>
+                      {currentStep === steps.length - 1 ? (
+                        <>
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Complete Profile
+                        </>
+                      ) : (
+                        <>
+                          Continue
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </>
+                      )}
+                    </>
+                  )}
+                </Button>
               </div>
-            </div>
-          )}
-
-          {/* Navigation */}
-          <div className="flex justify-between mt-8">
-            <Button variant="outline" onClick={prevStep} disabled={currentStep === 0}>
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Previous
-            </Button>
-            <Button onClick={nextStep} variant="hero">
-              {currentStep === steps.length - 1 ? "Create My Profile" : "Continue"}
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
+            </Card>
           </div>
-        </Card>
+
+          {/* Live Preview Panel */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <OnboardingPreview data={formData} currentStep={currentStep} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
