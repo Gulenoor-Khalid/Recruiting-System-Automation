@@ -23,6 +23,8 @@ export type Database = {
           pitch_text: string
           pitch_recording_url: string | null
           is_complete: boolean
+          generated_profile: any | null
+          profile_generated_at: string | null
         }
         Insert: {
           id?: string
@@ -38,6 +40,8 @@ export type Database = {
           pitch_text: string
           pitch_recording_url?: string | null
           is_complete?: boolean
+          generated_profile?: any | null
+          profile_generated_at?: string | null
         }
         Update: {
           id?: string
@@ -53,6 +57,8 @@ export type Database = {
           pitch_text?: string
           pitch_recording_url?: string | null
           is_complete?: boolean
+          generated_profile?: any | null
+          profile_generated_at?: string | null
         }
       }
     }

@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Sparkles, Save, CheckCircle } from "lucide-r
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import { generateProfile, type OnboardingAnswers } from "@/lib/profileGenerator";
 import StepAboutYou from "@/components/onboarding/StepAboutYou";
 import StepSkillsInterests from "@/components/onboarding/StepSkillsInterests";
 import StepCareerGoals from "@/components/onboarding/StepCareerGoals";
@@ -28,6 +29,7 @@ const OnboardingFlow = () => {
   const [candidateId, setCandidateId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -202,14 +204,35 @@ const OnboardingFlow = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Complete onboarding
-      await saveToSupabase(true);
-      localStorage.removeItem('onboarding_candidate_id');
-      toast({
-        title: "Profile completed! 🎉",
-        description: "Your AI-powered career profile is ready.",
-      });
-      navigate("/profile");
+      // Complete onboarding and generate AI profile
+      setIsGeneratingProfile(true);
+      try {
+        // Generate AI profile
+        const profile = await generateProfile(formData as OnboardingAnswers);
+        
+        // Save complete profile
+        await saveToSupabase(true);
+        
+        localStorage.removeItem('onboarding_candidate_id');
+        toast({
+          title: "Profile completed! 🎉",
+          description: "Your AI-powered career profile has been generated.",
+        });
+        navigate("/profile");
+      } catch (error) {
+        console.error('Error generating profile:', error);
+        toast({
+          title: "Profile generation failed",
+          description: "We'll generate your profile later. Your answers are saved.",
+          variant: "destructive"
+        });
+        // Still complete the onboarding even if AI generation fails
+        await saveToSupabase(true);
+        localStorage.removeItem('onboarding_candidate_id');
+        navigate("/profile");
+      } finally {
+        setIsGeneratingProfile(false);
+      }
     }
   };
 
@@ -321,7 +344,7 @@ const OnboardingFlow = () => {
                 </Button>
                 <Button 
                   onClick={nextStep} 
-                  disabled={isSaving}
+                  disabled={isSaving || isGeneratingProfile}
                   className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                 >
                   {isSaving ? (
@@ -329,12 +352,17 @@ const OnboardingFlow = () => {
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                       <span>Saving...</span>
                     </div>
+                  ) : isGeneratingProfile ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Generating AI Profile...</span>
+                    </div>
                   ) : (
                     <>
                       {currentStep === steps.length - 1 ? (
                         <>
                           <CheckCircle className="mr-2 h-4 w-4" />
-                          Complete Profile
+                          Generate AI Profile
                         </>
                       ) : (
                         <>
