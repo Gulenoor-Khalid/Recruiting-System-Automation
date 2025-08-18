@@ -115,6 +115,11 @@ export default {
 				'float': 'float 3s ease-in-out infinite',
 				'slideUp': 'slideUp 0.5s ease-out',
 				'fadeIn': 'fadeIn 0.6s ease-out'
+			},
+			boxShadow: {
+				'elegant': 'var(--shadow-elegant)',
+				'card': 'var(--shadow-card)',
+				'hover': 'var(--shadow-hover)'
 			}
 		}
 	},
