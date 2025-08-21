@@ -14,6 +14,9 @@ const LandingPage = () => {
             <span className="text-xl font-bold text-foreground">EntryPath Career</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
+            <Link to="/employer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              For Employers
+            </Link>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Sign In
             </Link>
