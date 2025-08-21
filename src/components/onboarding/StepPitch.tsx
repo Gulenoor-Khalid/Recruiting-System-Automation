@@ -2,8 +2,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Mic, MicOff, Play, Square, Upload } from "lucide-react";
-import { useState, useRef } from "react";
+import { Sparkles, Loader2 } from "lucide-react";
+import { useState } from "react";
+import PitchRecorder from "@/components/recorder/PitchRecorder";
+import { useScriptGenerator } from "@/hooks/useScriptGenerator";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface CandidateData {
   name: string;
@@ -14,6 +18,10 @@ interface CandidateData {
   goals: string;
   availability: string;
   pitch_text: string;
+  pitch_recording_url?: string;
+  pitch_video_url?: string;
+  pitch_transcript?: string;
+  pitch_evaluation?: any;
 }
 
 interface StepPitchProps {
@@ -23,66 +31,44 @@ interface StepPitchProps {
 }
 
 const StepPitch = ({ data, updateData, errors }: StepPitchProps) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const { generateScript, isGenerating } = useScriptGenerator();
 
-  const startRecording = async () => {
+  const handleGenerateScript = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      const chunks: BlobPart[] = [];
-      mediaRecorder.ondataavailable = (event) => {
-        chunks.push(event.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' });
-        setAudioBlob(blob);
-        setAudioUrl(URL.createObjectURL(blob));
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
+      const script = await generateScript(data);
+      updateData({ pitch_text: script });
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      console.error('Error generating script:', error);
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
+  const handleEvaluationComplete = async (evaluation: any, transcript: string, mediaUrl: string) => {
+    setIsSaving(true);
+    try {
+      // Determine if it's video or audio based on the mediaUrl or evaluation
+      const isVideo = mediaUrl.includes('video') || mediaUrl.includes('.webm');
+      
+      const updates: Partial<CandidateData> = {
+        pitch_transcript: transcript,
+        pitch_evaluation: evaluation,
+      };
 
-  const playAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
-  };
+      if (isVideo) {
+        updates.pitch_video_url = mediaUrl;
+      } else {
+        updates.pitch_recording_url = mediaUrl;
+      }
 
-  const generateAISuggestion = () => {
-    const aiSuggestion = `Hi, I'm ${data.name || '[Your Name]'}, ${
-      data.experience ? 
-        `with experience in ${data.experience.slice(0, 50)}...` : 
-        'a passionate professional'
-    }. I specialize in ${
-      data.skills.slice(0, 3).join(', ') || 'various skills'
-    } and I'm particularly interested in ${
-      data.interests.slice(0, 2).join(' and ') || 'innovative projects'
-    }. ${
-      data.goals ? 
-        `I'm looking for ${data.goals.slice(0, 80)}...` : 
-        'I\'m seeking new opportunities to grow and make an impact.'
-    } I'm ${data.availability || 'available'} and excited to discuss how I can contribute to your team.`;
-    
-    updateData({ pitch_text: aiSuggestion });
+      updateData(updates);
+      
+      toast.success('Recording and evaluation saved successfully!');
+    } catch (error) {
+      console.error('Error saving evaluation:', error);
+      toast.error('Failed to save evaluation');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -98,13 +84,28 @@ const StepPitch = ({ data, updateData, errors }: StepPitchProps) => {
         {/* AI-Generated Script */}
         <Card className="p-4 bg-gradient-to-r from-primary/5 to-accent/5">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium">✨ AI-Generated Script</h4>
+            <h4 className="font-medium flex items-center space-x-2">
+              <Sparkles className="h-4 w-4" />
+              <span>Generate My Script</span>
+            </h4>
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={generateAISuggestion}
+              onClick={handleGenerateScript}
+              disabled={isGenerating}
+              className="flex items-center space-x-2"
             >
-              Generate Script
+              {isGenerating ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  <span>Generate Script</span>
+                </>
+              )}
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -133,67 +134,41 @@ const StepPitch = ({ data, updateData, errors }: StepPitchProps) => {
           </div>
         </div>
 
-        {/* Recording Section */}
-        <Card className="p-6 space-y-4">
-          <div className="text-center space-y-2">
-            <h4 className="font-medium">🎤 Record Your Pitch</h4>
-            <p className="text-sm text-muted-foreground">
-              Practice and record your pitch to make it even more compelling
-            </p>
-          </div>
+        {/* Advanced Recording Section */}
+        <PitchRecorder 
+          onEvaluationComplete={handleEvaluationComplete}
+          disabled={isSaving}
+        />
 
-          <div className="flex justify-center space-x-4">
-            {!isRecording ? (
-              <Button 
-                onClick={startRecording}
-                className="flex items-center space-x-2"
-                variant="default"
-              >
-                <Mic className="h-4 w-4" />
-                <span>Start Recording</span>
-              </Button>
-            ) : (
-              <Button 
-                onClick={stopRecording}
-                className="flex items-center space-x-2"
-                variant="destructive"
-              >
-                <Square className="h-4 w-4" />
-                <span>Stop Recording</span>
-              </Button>
-            )}
-
-            {audioUrl && (
-              <Button 
-                onClick={playAudio}
-                variant="outline"
-                className="flex items-center space-x-2"
-              >
-                <Play className="h-4 w-4" />
-                <span>Play Recording</span>
-              </Button>
-            )}
-          </div>
-
-          {audioUrl && (
-            <audio ref={audioRef} src={audioUrl} className="hidden" />
-          )}
-
-          {isRecording && (
-            <div className="text-center">
-              <div className="inline-flex items-center space-x-2 text-red-600">
-                <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">Recording...</span>
+        {/* Show evaluation results if available */}
+        {data.pitch_evaluation && (
+          <Card className="p-4 bg-gradient-to-r from-blue-50 to-green-50 border-blue-200">
+            <h4 className="font-medium text-blue-800 mb-2">📊 Your Pitch Performance</h4>
+            <div className="grid grid-cols-4 gap-4 text-center mb-3">
+              <div>
+                <div className="text-lg font-bold text-blue-600">{data.pitch_evaluation.overall_score}/10</div>
+                <div className="text-xs text-muted-foreground">Overall</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-green-600">{data.pitch_evaluation.clarity}/10</div>
+                <div className="text-xs text-muted-foreground">Clarity</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-purple-600">{data.pitch_evaluation.confidence}/10</div>
+                <div className="text-xs text-muted-foreground">Confidence</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-orange-600">{data.pitch_evaluation.pacing}/10</div>
+                <div className="text-xs text-muted-foreground">Pacing</div>
               </div>
             </div>
-          )}
-
-          {audioBlob && (
-            <div className="text-center text-sm text-muted-foreground">
-              ✅ Recording saved! Your audio will be included in your profile.
-            </div>
-          )}
-        </Card>
+            {data.pitch_transcript && (
+              <div className="text-sm text-muted-foreground">
+                <strong>Transcript:</strong> "{data.pitch_transcript.substring(0, 100)}..."
+              </div>
+            )}
+          </Card>
+        )}
 
         {/* Tips */}
         <Card className="p-4 bg-muted/50">
