@@ -6,6 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Video, Target, Brain, Edit, Mic, Play, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TopMatches } from "@/components/jobs/TopMatches";
+import { Candidate } from "@/lib/jobMatcher";
 
 const UserProfile = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -27,6 +29,21 @@ const UserProfile = () => {
     goals: "Looking for a senior frontend role at an innovative tech company with growth opportunities and strong team culture.",
     matchScore: 94,
     profileCompletion: 85
+  };
+
+  // Create candidate object for job matching
+  const candidate: Candidate = {
+    name: userData.name,
+    skills: userData.skills.map(s => s.name),
+    experience: userData.experience,
+    goals: userData.goals,
+    generated_profile: {
+      titles: ["Frontend Developer", "React Developer"],
+      goals: {
+        roles: ["Senior Frontend Developer", "Full Stack Developer"],
+        industries: ["Tech", "Software"]
+      }
+    }
   };
 
   const handleRecord = () => {
@@ -255,23 +272,8 @@ const UserProfile = () => {
               </div>
             </Card>
 
-            {/* Job Recommendations */}
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4">Recommended for You</h3>
-              <div className="space-y-3">
-                <div className="text-sm">
-                  <p className="font-medium">Senior Frontend Developer</p>
-                  <p className="text-muted-foreground">TechCorp • 96% match</p>
-                </div>
-                <div className="text-sm">
-                  <p className="font-medium">React Developer</p>
-                  <p className="text-muted-foreground">StartupXYZ • 89% match</p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm" className="w-full mt-4" asChild>
-                <Link to="/jobs">View All Matches</Link>
-              </Button>
-            </Card>
+            {/* Top Job Matches */}
+            <TopMatches candidate={candidate} />
           </div>
         </div>
       </div>
