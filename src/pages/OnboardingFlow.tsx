@@ -11,6 +11,7 @@ import StepAboutYou from "@/components/onboarding/StepAboutYou";
 import StepSkillsInterests from "@/components/onboarding/StepSkillsInterests";
 import StepCareerGoals from "@/components/onboarding/StepCareerGoals";
 import StepPitch from "@/components/onboarding/StepPitch";
+import { StepPrivacy } from "@/components/onboarding/StepPrivacy";
 import OnboardingPreview from "@/components/onboarding/OnboardingPreview";
 
 interface CandidateData {
@@ -22,6 +23,9 @@ interface CandidateData {
   goals: string;
   availability: string;
   pitch_text: string;
+  pitch_visibility: 'public' | 'private' | 'link';
+  profile_published: boolean;
+  consent_given: boolean;
 }
 
 const OnboardingFlow = () => {
@@ -42,7 +46,10 @@ const OnboardingFlow = () => {
     interests: [],
     goals: "",
     availability: "",
-    pitch_text: ""
+    pitch_text: "",
+    pitch_visibility: 'private',
+    profile_published: false,
+    consent_given: false
   });
 
   const steps = [
@@ -61,6 +68,10 @@ const OnboardingFlow = () => {
     {
       title: "60-Second Pitch",
       description: "Create your compelling elevator pitch"
+    },
+    {
+      title: "Privacy Settings",
+      description: "Control who can see your profile and pitch"
     }
   ];
 
@@ -84,10 +95,13 @@ const OnboardingFlow = () => {
             interests: data.interests || [],
             goals: data.goals || "",
             availability: data.availability || "",
-            pitch_text: data.pitch_text || ""
+            pitch_text: data.pitch_text || "",
+            pitch_visibility: data.pitch_visibility || 'private',
+            profile_published: data.profile_published || false,
+            consent_given: data.consent_given || false
           });
           setCandidateId(data.id);
-          setCurrentStep(data.is_complete ? 3 : getCurrentStepFromData(data));
+          setCurrentStep(data.is_complete ? 4 : getCurrentStepFromData(data));
         }
       }
       setIsLoading(false);
@@ -100,7 +114,8 @@ const OnboardingFlow = () => {
     if (!data.name || !data.email || !data.experience) return 0;
     if (data.skills.length === 0 || data.interests.length === 0) return 1;
     if (!data.goals || !data.availability) return 2;
-    return 3;
+    if (!data.pitch_text) return 3;
+    return 4;
   };
 
   const updateData = (updates: Partial<CandidateData>) => {
@@ -136,6 +151,11 @@ const OnboardingFlow = () => {
         break;
       case 3:
         if (!formData.pitch_text.trim()) newErrors.pitch_text = "Pitch text is required";
+        break;
+      case 4:
+        if (formData.pitch_visibility === 'public' && !formData.consent_given) {
+          newErrors.consent_given = "Consent is required to make your profile public";
+        }
         break;
     }
 
@@ -326,6 +346,14 @@ const OnboardingFlow = () => {
               
               {currentStep === 3 && (
                 <StepPitch 
+                  data={formData} 
+                  updateData={updateData} 
+                  errors={errors} 
+                />
+              )}
+              
+              {currentStep === 4 && (
+                <StepPrivacy 
                   data={formData} 
                   updateData={updateData} 
                   errors={errors} 

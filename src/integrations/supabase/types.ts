@@ -17,6 +17,8 @@ export type Database = {
       candidates: {
         Row: {
           availability: string
+          consent_given: boolean
+          consent_given_at: string | null
           created_at: string
           email: string
           experience: string
@@ -31,12 +33,16 @@ export type Database = {
           pitch_text: string
           pitch_transcript: string | null
           pitch_video_url: string | null
+          pitch_visibility: string
           profile_generated_at: string | null
+          profile_published: boolean
           skills: string[]
           updated_at: string
         }
         Insert: {
           availability: string
+          consent_given?: boolean
+          consent_given_at?: string | null
           created_at?: string
           email: string
           experience: string
@@ -51,12 +57,16 @@ export type Database = {
           pitch_text: string
           pitch_transcript?: string | null
           pitch_video_url?: string | null
+          pitch_visibility?: string
           profile_generated_at?: string | null
+          profile_published?: boolean
           skills?: string[]
           updated_at?: string
         }
         Update: {
           availability?: string
+          consent_given?: boolean
+          consent_given_at?: string | null
           created_at?: string
           email?: string
           experience?: string
@@ -71,7 +81,9 @@ export type Database = {
           pitch_text?: string
           pitch_transcript?: string | null
           pitch_video_url?: string | null
+          pitch_visibility?: string
           profile_generated_at?: string | null
+          profile_published?: boolean
           skills?: string[]
           updated_at?: string
         }

@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Heart, MessageSquare, Eye, Play, Brain, MapPin, Clock } from "lucide-react";
 import { ContactForm } from "./ContactForm";
+import { PrivacyIndicator } from "@/components/ui/privacy-indicator";
 
 interface Candidate {
   id: string;
@@ -15,6 +16,8 @@ interface Candidate {
   goals: string;
   pitch_recording_url?: string;
   pitch_video_url?: string;
+  pitch_visibility?: 'public' | 'private' | 'link';
+  profile_published?: boolean;
   generated_profile?: {
     titles?: string[];
     summary?: string;
@@ -61,7 +64,12 @@ export const CandidateCard = ({
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-lg">{candidate.name}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-lg">{candidate.name}</h3>
+                {candidate.pitch_visibility && candidate.pitch_visibility !== 'public' && (
+                  <PrivacyIndicator visibility={candidate.pitch_visibility} />
+                )}
+              </div>
               <p className="text-sm text-muted-foreground">{candidateTitle}</p>
             </div>
           </div>
@@ -152,10 +160,14 @@ export const CandidateCard = ({
             <Button 
               size="sm" 
               variant="outline"
-              className="px-3"
+              className="px-3 flex items-center gap-1"
               title="Watch 60-second pitch"
+              disabled={candidate.pitch_visibility === 'private'}
             >
               <Play className="h-3 w-3" />
+              {candidate.pitch_visibility && candidate.pitch_visibility !== 'public' && (
+                <PrivacyIndicator visibility={candidate.pitch_visibility} className="ml-1" />
+              )}
             </Button>
           )}
           <Button 
