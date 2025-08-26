@@ -28,7 +28,7 @@ const LandingPage = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <Link to="/onboarding">
-                    Start Your Career Journey
+                    Sign in as Candidate
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
