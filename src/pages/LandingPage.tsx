@@ -65,43 +65,56 @@ const LandingPage = () => {
                 </Link>
               </Button>
               
-              {/* Video Demo Section */}
-              <div className="w-full max-w-2xl">
+              {/* Video Demo Section - Side by Side */}
+              <div className="w-full max-w-4xl">
                 <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 border-2 hover:shadow-lg transition-all duration-300">
-                  <div className="relative aspect-video bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                    {/* Video Thumbnail/Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20"></div>
-                    
-                    {/* Content */}
-                    <div className="relative z-10 text-center p-8">
-                      <h3 className="text-2xl font-bold text-foreground mb-2">
-                        Watch Sarah's 60-Second Pitch
+                  <div className="grid grid-cols-1 md:grid-cols-2 min-h-[300px]">
+                    {/* Left Side - Content */}
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-8 flex flex-col justify-center text-white">
+                      <h3 className="text-2xl font-bold mb-4">
+                        Listen to Sarah Interview a Real Candidate
                       </h3>
-                      <p className="text-muted-foreground mb-6">
-                        See how AI coaching helps create compelling career stories
+                      <p className="text-blue-100 mb-6">
+                        No Edits - Just AI Screening in Action
                       </p>
                       
-                      {/* Play Button */}
-                      <div className="relative">
+                      {/* Play Controls */}
+                      <div className="flex items-center gap-4">
                         <Button 
                           size="lg" 
                           variant="outline" 
-                          className="bg-white/90 hover:bg-white border-2 shadow-lg"
+                          className="bg-white/10 hover:bg-white/20 border-white/30 text-white"
                         >
                           <Play className="mr-2 h-5 w-5" />
-                          Watch Demo Pitch
+                          Play Demo
                         </Button>
+                        
+                        {/* Duration */}
+                        <span className="text-sm text-blue-100">0:00 / 3:21</span>
                       </div>
                     </div>
                     
-                    {/* Decorative Elements */}
-                    <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                      <Sparkles className="h-6 w-6 text-white" />
-                    </div>
-                    
-                    {/* Video Duration Badge */}
-                    <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-                      0:00 / 1:00
+                    {/* Right Side - Video Preview */}
+                    <div className="bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-8">
+                      <div className="text-center">
+                        {/* Video illustration placeholder */}
+                        <div className="w-48 h-32 bg-white rounded-lg shadow-lg mb-4 flex items-center justify-center">
+                          <div className="flex gap-4">
+                            {/* Interviewer */}
+                            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                              <Users className="h-6 w-6 text-gray-600" />
+                            </div>
+                            {/* Candidate */}
+                            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                              <Target className="h-6 w-6 text-white" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground">
+                          Real AI-powered interview demo
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </Card>
