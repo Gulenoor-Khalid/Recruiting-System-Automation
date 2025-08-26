@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Brain, Users, Target, Sparkles, ChevronRight, Play, ChevronDown, Volume2, Maximize2, MoreHorizontal } from "lucide-react";
+import { Brain, Users, Target, Sparkles, ChevronRight, Play, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const LandingPage = () => {
@@ -45,72 +45,31 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="animate-fadeIn">
-              <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  AI-Powered
-                </span>
-                <br />
-                Career Matching
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
-                and get matched with perfect opportunities.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" variant="hero" asChild>
-                  <Link to="/onboarding">
-                    Start Your Career Journey
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Video Demo */}
-            <div className="animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-              <Card className="overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
-                <div className="aspect-video bg-gradient-to-br from-primary to-accent p-8 relative">
-                  <div className="absolute inset-0 bg-black/20"></div>
-                  <div className="relative z-10 h-full flex flex-col">
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="text-center text-white">
-                        <h3 className="text-2xl font-bold mb-2">Listen to Morgan</h3>
-                        <h4 className="text-xl mb-4">Interview a Real Candidate</h4>
-                        <p className="text-sm opacity-90">No Edits - Just AI Screening in Action</p>
-                      </div>
-                    </div>
-                    
-                    {/* Video Controls */}
-                    <div className="bg-black/50 rounded-lg p-4 backdrop-blur-sm">
-                      <div className="flex items-center gap-4">
-                        <Button size="sm" variant="ghost" className="text-white hover:bg-white/20 p-2">
-                          <Play className="h-5 w-5" />
-                        </Button>
-                        <div className="flex-1">
-                          <div className="text-white text-sm mb-1">0:00 / 3:21</div>
-                          <div className="w-full bg-white/30 rounded-full h-1">
-                            <div className="bg-white h-1 rounded-full w-0"></div>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="ghost" className="text-white hover:bg-white/20 p-2">
-                            <Volume2 className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="ghost" className="text-white hover:bg-white/20 p-2">
-                            <Maximize2 className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="ghost" className="text-white hover:bg-white/20 p-2">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+          <div className="text-center animate-fadeIn">
+            <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                AI-Powered
+              </span>
+              <br />
+              Career Matching
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+              Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
+              and get matched with perfect opportunities.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="hero" asChild>
+                <Link to="/onboarding">
+                  Start Your Career Journey
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/demo">
+                  <Play className="mr-2 h-4 w-4" />
+                  Watch Demo
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
