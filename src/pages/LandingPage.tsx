@@ -45,82 +45,31 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Hero Content */}
-            <div className="animate-fadeIn">
-              <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  AI-Powered
-                </span>
-                <br />
-                Career Matching
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
-                and get matched with perfect opportunities.
-              </p>
-              
+          <div className="text-center animate-fadeIn">
+            <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                AI-Powered
+              </span>
+              <br />
+              Career Matching
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+              Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
+              and get matched with perfect opportunities.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="hero" asChild>
                 <Link to="/onboarding">
                   Start Your Career Journey
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-            </div>
-            
-            {/* Right Side - Video Demo Section */}
-            <div className="w-full">
-              <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 border-2 hover:shadow-lg transition-all duration-300">
-                <div className="grid grid-cols-1 md:grid-cols-2 min-h-[300px]">
-                  {/* Left Side - Content */}
-                  <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 flex flex-col justify-center text-white">
-                    <h3 className="text-xl font-bold mb-3">
-                      Listen to Sarah Interview a Real Candidate
-                    </h3>
-                    <p className="text-blue-100 mb-4 text-sm">
-                      No Edits - Just AI Screening in Action
-                    </p>
-                    
-                    {/* Play Controls */}
-                    <div className="flex items-center gap-3">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="bg-white/10 hover:bg-white/20 border-white/30 text-white"
-                      >
-                        <Play className="mr-2 h-4 w-4" />
-                        Play Demo
-                      </Button>
-                      
-                      {/* Duration */}
-                      <span className="text-xs text-blue-100">0:00 / 3:21</span>
-                    </div>
-                  </div>
-                  
-                  {/* Right Side - Video Preview */}
-                  <div className="bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-6">
-                    <div className="text-center">
-                      {/* Video illustration placeholder */}
-                      <div className="w-32 h-20 bg-white rounded-lg shadow-lg mb-3 flex items-center justify-center">
-                        <div className="flex gap-2">
-                          {/* Interviewer */}
-                          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                            <Users className="h-4 w-4 text-gray-600" />
-                          </div>
-                          {/* Candidate */}
-                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Target className="h-4 w-4 text-white" />
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground">
-                        Real AI-powered interview demo
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/demo">
+                  <Play className="mr-2 h-4 w-4" />
+                  Watch Demo
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
