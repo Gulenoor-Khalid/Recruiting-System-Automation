@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Brain, Users, Target, Sparkles, ChevronRight, Play } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Brain, Users, Target, Sparkles, ChevronRight, Play, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const LandingPage = () => {
@@ -17,9 +18,26 @@ const LandingPage = () => {
             <Link to="/employer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               For Employers
             </Link>
-            <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Sign In
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                  Sign In
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/login?role=candidate">
+                    Sign in as Candidate
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/login?role=employer">
+                    Sign in as Employer
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" size="sm" asChild>
               <Link to="/register">Get Started</Link>
             </Button>
