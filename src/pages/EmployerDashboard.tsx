@@ -200,8 +200,7 @@ const EmployerDashboard = () => {
                 onClick={() => navigate('/')}
                 className="flex items-center"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Main
+                <ArrowLeft className="h-4 w-4" />
               </Button>
               <h1 className="text-xl font-bold text-primary">Employer Dashboard</h1>
             </div>
