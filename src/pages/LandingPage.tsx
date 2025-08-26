@@ -49,25 +49,20 @@ const LandingPage = () => {
             {/* Left Content */}
             <div className="animate-fadeIn">
               <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
-                Accelerate Your
-                <br />
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Hiring with AI
+                  AI-Powered
                 </span>
+                <br />
+                Career Matching
               </h1>
               <p className="text-xl text-muted-foreground mb-8">
-                Powered by AI. Driven by People. EntryPath makes hiring easy.
+                Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
+                and get matched with perfect opportunities.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" variant="default" className="bg-foreground text-background hover:bg-foreground/90" asChild>
-                  <Link to="/employer">
-                    For Businesses
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
                 <Button size="lg" variant="hero" asChild>
                   <Link to="/onboarding">
-                    Book a Demo
+                    Start Your Career Journey
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
