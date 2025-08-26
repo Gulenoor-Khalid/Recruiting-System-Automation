@@ -197,11 +197,6 @@ const EmployerDashboard = () => {
                 <Plus className="mr-2 h-4 w-4" />
                 Post Your Job
               </Button>
-              <Button variant="outline" size="sm">
-                <Users className="mr-2 h-4 w-4" />
-                Team
-              </Button>
-              <Button variant="outline" size="sm">Settings</Button>
             </div>
           </div>
         </div>
