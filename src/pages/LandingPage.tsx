@@ -32,7 +32,7 @@ const LandingPage = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/login?role=employer">
+                  <Link to="/employer">
                     Sign in as Employer
                   </Link>
                 </DropdownMenuItem>
