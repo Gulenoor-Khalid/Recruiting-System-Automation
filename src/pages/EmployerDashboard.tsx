@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { CandidateCard } from "@/components/employer/CandidateCard";
 import { CandidateFilters, FilterOptions } from "@/components/employer/CandidateFilters";
+import { JobPostingForm } from "@/components/employer/JobPostingForm";
 import { computeFitScore, type JobMatch } from "@/lib/jobMatcher";
 import { toast } from "sonner";
 
@@ -46,6 +47,7 @@ const EmployerDashboard = () => {
     minScore: 0
   });
   const [loading, setLoading] = useState(true);
+  const [showJobForm, setShowJobForm] = useState(false);
 
   // Sample job for matching (in real app, this would come from employer's job posting)
   const sampleJob = {
@@ -204,7 +206,7 @@ const EmployerDashboard = () => {
               <h1 className="text-xl font-bold text-primary">Employer Dashboard</h1>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="default">
+              <Button variant="default" onClick={() => setShowJobForm(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Post Your Job
               </Button>
@@ -253,7 +255,11 @@ const EmployerDashboard = () => {
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button className="justify-start h-auto p-4" variant="outline">
+                <Button 
+                  className="justify-start h-auto p-4" 
+                  variant="outline"
+                  onClick={() => setShowJobForm(true)}
+                >
                   <Plus className="mr-3 h-5 w-5" />
                   <div className="text-left">
                     <div className="font-medium">Post New Job</div>
@@ -354,7 +360,7 @@ const EmployerDashboard = () => {
           <TabsContent value="jobs" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Job Postings</h2>
-              <Button>
+              <Button onClick={() => setShowJobForm(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Post New Job
               </Button>
@@ -554,6 +560,21 @@ const EmployerDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Job Posting Form Modal */}
+      {showJobForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <JobPostingForm 
+              onClose={() => setShowJobForm(false)}
+              onSubmit={(jobData) => {
+                console.log("Job data:", jobData);
+                setShowJobForm(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
