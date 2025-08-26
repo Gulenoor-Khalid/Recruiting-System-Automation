@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Users, Target, MessageSquare, Heart, Filter, Plus, Briefcase, BarChart3, TrendingUp, Calendar, Building } from "lucide-react";
+import { Search, Users, Target, MessageSquare, Heart, Filter, Plus, Briefcase, BarChart3, TrendingUp, Calendar, Building, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { CandidateCard } from "@/components/employer/CandidateCard";
 import { CandidateFilters, FilterOptions } from "@/components/employer/CandidateFilters";
@@ -33,6 +34,7 @@ interface CandidateWithMatch extends DatabaseCandidate {
 }
 
 const EmployerDashboard = () => {
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState<CandidateWithMatch[]>([]);
   const [filteredCandidates, setFilteredCandidates] = useState<CandidateWithMatch[]>([]);
   const [shortlistedIds, setShortlistedIds] = useState<Set<string>>(new Set());
@@ -190,7 +192,16 @@ const EmployerDashboard = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-primary">Employer</h1>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="flex items-center"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Main
+              </Button>
+              <h1 className="text-xl font-bold text-primary">Employer Dashboard</h1>
             </div>
             <div className="flex items-center space-x-2">
               <Button variant="default">
