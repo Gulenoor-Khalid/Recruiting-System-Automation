@@ -27,8 +27,8 @@ const LandingPage = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link to="/login?role=candidate">
-                    Sign in as Candidate
+                  <Link to="/onboarding">
+                    Start Your Career Journey
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
