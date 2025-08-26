@@ -57,19 +57,55 @@ const LandingPage = () => {
               Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
               and get matched with perfect opportunities.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col items-center gap-8">
               <Button size="lg" variant="hero" asChild>
                 <Link to="/onboarding">
                   Start Your Career Journey
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link to="/demo">
-                  <Play className="mr-2 h-4 w-4" />
-                  Watch Demo
-                </Link>
-              </Button>
+              
+              {/* Video Demo Section */}
+              <div className="w-full max-w-2xl">
+                <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 border-2 hover:shadow-lg transition-all duration-300">
+                  <div className="relative aspect-video bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                    {/* Video Thumbnail/Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20"></div>
+                    
+                    {/* Content */}
+                    <div className="relative z-10 text-center p-8">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">
+                        Watch Sarah's 60-Second Pitch
+                      </h3>
+                      <p className="text-muted-foreground mb-6">
+                        See how AI coaching helps create compelling career stories
+                      </p>
+                      
+                      {/* Play Button */}
+                      <div className="relative">
+                        <Button 
+                          size="lg" 
+                          variant="outline" 
+                          className="bg-white/90 hover:bg-white border-2 shadow-lg"
+                        >
+                          <Play className="mr-2 h-5 w-5" />
+                          Watch Demo Pitch
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Decorative Elements */}
+                    <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-white" />
+                    </div>
+                    
+                    {/* Video Duration Badge */}
+                    <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                      0:00 / 1:00
+                    </div>
+                  </div>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
