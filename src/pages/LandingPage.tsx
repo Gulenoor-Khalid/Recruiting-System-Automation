@@ -45,54 +45,31 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Text Content */}
-            <div className="animate-fadeIn">
-              <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  AI-Powered
-                </span>
-                <br />
-                Career Matching
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
-                and get matched with perfect opportunities.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" variant="hero" asChild>
-                  <Link to="/onboarding">
-                    Start Your Career Journey
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to="/demo">
-                    <Play className="mr-2 h-4 w-4" />
-                    Watch Demo
-                  </Link>
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Side - Video Demo */}
-            <div className="animate-fadeIn" style={{ animationDelay: "0.2s" }}>
-              <Card className="p-6 bg-gradient-to-br from-card to-muted/30">
-                <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10"></div>
-                  <div className="relative z-10 text-center">
-                    <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Play className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">AI Interview Demo</h3>
-                    <p className="text-sm text-muted-foreground">See how our AI conducts real candidate interviews</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <h4 className="font-semibold text-foreground mb-2">Watch Morgan Interview a Real Candidate</h4>
-                  <p className="text-sm text-muted-foreground">Experience the future of hiring with AI-powered candidate assessment</p>
-                </div>
-              </Card>
+          <div className="text-center animate-fadeIn">
+            <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                AI-Powered
+              </span>
+              <br />
+              Career Matching
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+              Go beyond resumes. Create dynamic profiles, showcase your potential with AI-guided pitches, 
+              and get matched with perfect opportunities.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="hero" asChild>
+                <Link to="/onboarding">
+                  Start Your Career Journey
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/demo">
+                  <Play className="mr-2 h-4 w-4" />
+                  Watch Demo
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
