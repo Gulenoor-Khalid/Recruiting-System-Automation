@@ -38,6 +38,9 @@ const LandingPage = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/register">Get Started</Link>
+            </Button>
           </nav>
         </div>
       </header>
