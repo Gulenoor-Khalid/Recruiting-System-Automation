@@ -36,6 +36,11 @@ const LandingPage = () => {
                     Sign in as Employer
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin">
+                    Admin Panel
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button variant="outline" size="sm" asChild>

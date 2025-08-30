@@ -9,6 +9,7 @@ import LandingPage from "./pages/LandingPage";
 import OnboardingFlow from "./pages/OnboardingFlow";
 import UserProfile from "./pages/UserProfile";
 import EmployerDashboard from "./pages/EmployerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/onboarding" element={<OnboardingFlow />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/employer" element={<EmployerDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/old-index" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
